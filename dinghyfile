@@ -32,7 +32,7 @@
         {{
           module "deploy.stage.module" 
           "account" "gke-away"
-          "name" "Deploy to Test Mar-10-2020"
+          "name" "Deploy to Test Mar-11-2020 Hello AU"
           "namespace" "test"
           "refId" "deployDev"
         }},
