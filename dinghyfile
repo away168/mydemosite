@@ -2,7 +2,7 @@
   "application": "websitedinghy",
   "email": "away@armory.io",
   "globals": {
-    "waitTime": "15"
+    "waitTime": "10"
   },
   "deleteStalePipelines": true,
   "pipelines": [
