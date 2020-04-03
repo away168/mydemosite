@@ -14,7 +14,7 @@
       "name": "Deploy and Check [GitOps]",
       "expectedArtifacts": [],
       "keepWaitingPipelines": false,
-      "lastModifiedBy": "anonymous",
+      "lastModifiedBy": "Dinghy",
       "limitConcurrent": true,
       "parameterConfig": [
         {
@@ -238,6 +238,85 @@
         }
       ],
       "updateTs": "1568781085000"
+    },
+    {
+      "application": "website-gitops",
+      "name": "Daily Cleanup (GitOps)",
+      "expectedArtifacts": [],
+      "keepWaitingPipelines": false,
+      "lastModifiedBy": "Dinghy",
+      "limitConcurrent": true,
+      "stages": [
+        {
+          "account": "dev-us-west-2",
+          "app": "website-gitops",
+          "cloudProvider": "kubernetes",
+          "location": "dev",
+          "manifestName": "service website-service",
+          "mode": "static",
+          "name": "Delete Dev LB",
+          "options": {
+            "cascading": true
+          },
+          "refId": "1",
+          "requisiteStageRefIds": [],
+          "type": "deleteManifest"
+        },
+        {
+          "account": "dev-us-west-2",
+          "app": "website-gitops",
+          "cloudProvider": "kubernetes",
+          "location": "prod",
+          "manifestName": "service website-service",
+          "mode": "static",
+          "name": "Delete Prod LB",
+          "options": {
+            "cascading": true
+          },
+          "refId": "2",
+          "requisiteStageRefIds": [],
+          "type": "deleteManifest"
+        },
+        {
+          "account": "dev-us-west-2",
+          "app": "website-gitops",
+          "cloudProvider": "kubernetes",
+          "location": "prod",
+          "manifestName": "deployment website-dev",
+          "mode": "static",
+          "name": "Scale Prod to 0",
+          "refId": "3",
+          "replicas": "0",
+          "requisiteStageRefIds": [
+            "2"
+          ],
+          "type": "scaleManifest"
+        },
+        {
+          "account": "dev-us-west-2",
+          "app": "website-gitops",
+          "cloudProvider": "kubernetes",
+          "location": "dev",
+          "manifestName": "deployment website-dev",
+          "mode": "static",
+          "name": "Scale Dev to 0",
+          "refId": "4",
+          "replicas": "0",
+          "requisiteStageRefIds": [
+            "1"
+          ],
+          "type": "scaleManifest"
+        }
+      ],
+      "triggers": [
+        {
+          "cronExpression": "0 0 0 1/1 * ? *",
+          "enabled": true,
+          "id": "27aa279d-bb44-43c9-b2a8-1da1e270c1a4",
+          "type": "cron"
+        }
+      ],
+      "updateTs": "1585936845000"
     }
   ]
 }
