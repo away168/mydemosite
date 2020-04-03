@@ -34,9 +34,9 @@
       "stages": [
         {{
           module "deploy.stage.away.v1" 
-          "account" "gke-away"
+          "account" "dev-us-west-2"
           "name" "Deploy to Test Apr-03-2020"
-          "namespace" "test"
+          "namespace" "dev"
           "refId" "deployDev"
         }},
         {
@@ -81,9 +81,9 @@
           "judgmentInputs" [{"value": "But of course"}, {"value": "No"}]
         }},
         {
-          "account": "gke-away",
+          "account": "prod-us-west-2",
           "cloudProvider": "kubernetes",
-          "location": "dev",
+          "location": "prod",
           "manifestName": "deployment website-dev",
           "mode": "static",
           "name": "Undo Stage Rollout (Manifest)",
@@ -99,7 +99,7 @@
           "type": "undoRolloutManifest"
         },
         {
-          "account": "gke-away",
+          "account": "prod-us-west-2",
           "cloudProvider": "kubernetes",
           "manifestArtifactAccount": "away168-github-artifact-account",
           "manifests": [
@@ -146,7 +146,7 @@
           "moniker": {
             "app": "website"
           },
-          "name": "Deploy to GKE Prod 2019-NOV-16",
+          "name": "Deploy to Prod 2019-NOV-16",
           "refId": "4",
           "relationships": {
             "loadBalancers": [],
@@ -176,7 +176,7 @@
         },
         {{
           module "deploy.stage.away.v1" 
-          "account" "gke-away"
+          "account" "prod-us-west-2"
           "name" "Deploy to Prod"
           "namespace" "prod"
           "refId" "deployProd"
