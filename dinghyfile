@@ -1,5 +1,5 @@
 {
-  "application": "websitedinghy",
+  "application": "website-gitops",
   "spec": 
   {
     "email": "andrew.way@armory.io"
@@ -10,8 +10,8 @@
   "deleteStalePipelines": true,
   "pipelines": [
     {
-      "application": "websitedinghy",
-      "name": "Deploy and Check [Dinghy]",
+      "application": "website-gitops",
+      "name": "Deploy and Check [GitOps]",
       "expectedArtifacts": [],
       "keepWaitingPipelines": false,
       "lastModifiedBy": "anonymous",
