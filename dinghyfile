@@ -46,8 +46,8 @@
           "master": "jenkins-sales",
           "name": "Automated Test (via Jenkins)",
           "parameters": {
-            "DemoBoolean": true,
-            "DemoString": "Foo"
+            "customconfig": "this is my special config",
+            "special": true
           },
           "propertyFile": "build.properties",
           "refId": "IntegrationTest",
