@@ -32,6 +32,52 @@
         }
       ],
       "stages": [
+        {
+          "account": "dev-us-west-2",
+          "cloudProvider": "kubernetes",
+          "isNew": true,
+          "manifests": [
+            {
+              "apiVersion": "v1",
+              "kind": "Service",
+              "metadata": {
+                "name": "website-service",
+                "namespace": "dev"
+              },
+              "spec": {
+                "ports": [
+                  {
+                    "port": 80,
+                    "protocol": "TCP",
+                    "targetPort": 80
+                  }
+                ],
+                "selector": {
+                  "app": "website"
+                },
+                "type": "LoadBalancer"
+              }
+            }
+          ],
+          "moniker": {
+            "app": "website-gitops"
+          },
+          "name": "Deploy LB",
+          "refId": "Deploy LB Dev",
+          "requisiteStageRefIds": [],
+          "skipExpressionEvaluation": false,
+          "source": "text",
+          "trafficManagement": {
+            "enabled": false,
+            "options": {
+              "enableTraffic": false,
+              "namespace": null,
+              "services": [],
+              "strategy": null
+            }
+          },
+          "type": "deployManifest"
+        },
         {{
           module "deploy.stage.away.v1" 
           "account" "dev-us-west-2"
@@ -101,75 +147,45 @@
         {
           "account": "prod-us-west-2",
           "cloudProvider": "kubernetes",
-          "manifestArtifactAccount": "away168-github-artifact-account",
+          "isNew": true,
           "manifests": [
             {
-              "apiVersion": "apps/v1",
-              "kind": "Deployment",
+              "apiVersion": "v1",
+              "kind": "Service",
               "metadata": {
-                "labels": {
-                  "app": "website"
-                },
-                "name": "website-prod",
+                "name": "website-service",
                 "namespace": "prod"
               },
               "spec": {
-                "replicas": "${ #toInt( parameters.prodcount )  }",
+                "ports": [
+                  {
+                    "port": 80,
+                    "protocol": "TCP",
+                    "targetPort": 80
+                  }
+                ],
                 "selector": {
-                  "matchLabels": {
-                    "app": "website"
-                  }
+                  "app": "website"
                 },
-                "template": {
-                  "metadata": {
-                    "labels": {
-                      "app": "website"
-                    }
-                  },
-                  "spec": {
-                    "containers": [
-                      {
-                        "image": "away168/mysite:${trigger.tag}",
-                        "name": "mysite",
-                        "ports": [
-                          {
-                            "containerPort": 80
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                }
+                "type": "LoadBalancer"
               }
             }
           ],
           "moniker": {
             "app": "website-gitops"
           },
-          "name": "Deploy to Prod 2019-NOV-16",
-          "refId": "4",
-          "relationships": {
-            "loadBalancers": [],
-            "securityGroups": []
-          },
-          "requisiteStageRefIds": [
-            "Manual Judgment"
-          ],
+          "name": "Deploy LB Prod",
+          "refId": "Deploy LB Prod",
+          "requisiteStageRefIds": ["Manual Judgment"],
           "skipExpressionEvaluation": false,
           "source": "text",
-          "stageEnabled": {
-            "expression": "${#judgment(\"Manual Judgment\") != \"Nope\"}",
-            "type": "expression"
-          },
           "trafficManagement": {
             "enabled": false,
             "options": {
-              "enableTraffic": true,
-              "namespace": "prod",
-              "services": [
-                "service website-prod-service"
-              ],
-              "strategy": "redblack"
+              "enableTraffic": false,
+              "namespace": null,
+              "services": [],
+              "strategy": null
             }
           },
           "type": "deployManifest"
@@ -180,7 +196,7 @@
           "name" "Deploy to Prod"
           "namespace" "prod"
           "refId" "deployProd"
-          "requisiteStageRefIds" ["Manual Judgment"]
+          "requisiteStageRefIds" ["Manual Judgment", "Deploy LB Prod"]
           "stageEnabledExpression" "${#judgment('Manual Judgment') != 'No'}"
         }},
         {{
