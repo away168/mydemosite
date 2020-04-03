@@ -33,7 +33,7 @@
       ],
       "stages": [
         {{
-          module "deploy.stage.module" 
+          module "deploy.stage.away.v1" 
           "account" "gke-away"
           "name" "Deploy to Test Mar-12-2020 6 sides make a ..."
           "namespace" "test"
@@ -175,7 +175,7 @@
           "type": "deployManifest"
         },
         {{
-          module "deploy.stage.module" 
+          module "deploy.stage.away.v1" 
           "account" "gke-away"
           "name" "Deploy to Prod"
           "namespace" "prod"
