@@ -42,8 +42,8 @@
         {
           "continuePipeline": false,
           "failPipeline": true,
-          "job": "IntegrationTest-Website",
-          "master": "my-jenkins-master",
+          "job": "do-nothing",
+          "master": "jenkins-sales",
           "name": "Automated Test (via Jenkins)",
           "parameters": {
             "DemoBoolean": true,
