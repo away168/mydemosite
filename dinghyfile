@@ -144,7 +144,7 @@
             }
           ],
           "moniker": {
-            "app": "website"
+            "app": "website-gitops"
           },
           "name": "Deploy to Prod 2019-NOV-16",
           "refId": "4",
