@@ -46,8 +46,8 @@
           "master": "jenkins-sales",
           "name": "Automated Test (via Jenkins)",
           "parameters": {
-            "customconfig": "this is my special config",
-            "special": true
+            "customconfig": "run test",
+            "special": false
           },
           "propertyFile": "build.properties",
           "refId": "IntegrationTest",
@@ -59,14 +59,14 @@
         {
           "continuePipeline": false,
           "failPipeline": true,
-          "job": "SecurityScan",
-          "master": "my-jenkins-master",
+          "job": "do-nothing",
+          "master": "jenkins-sales",
           "name": "Security Scan",
           "parameters": {
-            "DependencyCheck": true,
-            "Environment": "${trigger.user}"
+            "customconfig": "perform a scan",
+            "special": true
           },
-          "propertyFile": "scan.properties",
+          "propertyFile": "build.properties",
           "refId": "SecurityScan",
           "requisiteStageRefIds": [
             "deployDev"
