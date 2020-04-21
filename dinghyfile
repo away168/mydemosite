@@ -3,7 +3,7 @@
     "waitTime": "17",
     "application": "website-gitops"
   },
-  "application": "{{@application}}",
+  "application": "website-gitops",
   "spec": 
   {
     "email": "andrew.way@armory.io"
@@ -12,7 +12,7 @@
   "deleteStalePipelines": true,
   "pipelines": [
     {
-      "application": "website-gitops",
+      "application": "{{@application}}",
       "name": "Deploy and Check [GitOps]",
       "expectedArtifacts": [],
       "keepWaitingPipelines": false,
