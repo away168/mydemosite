@@ -33,52 +33,12 @@
         }
       ],
       "stages": [
-        {
-          "account": "dev-us-west-2",
-          "cloudProvider": "kubernetes",
-          "isNew": true,
-          "manifests": [
-            {
-              "apiVersion": "v1",
-              "kind": "Service",
-              "metadata": {
-                "name": "website-service",
-                "namespace": "dev"
-              },
-              "spec": {
-                "ports": [
-                  {
-                    "port": 80,
-                    "protocol": "TCP",
-                    "targetPort": 80
-                  }
-                ],
-                "selector": {
-                  "app": "website"
-                },
-                "type": "LoadBalancer"
-              }
-            }
-          ],
-          "moniker": {
-            "app": "website-gitops"
-          },
-          "name": "Deploy LB",
-          "refId": "Deploy LB Dev",
-          "requisiteStageRefIds": [],
-          "skipExpressionEvaluation": false,
-          "source": "text",
-          "trafficManagement": {
-            "enabled": false,
-            "options": {
-              "enableTraffic": false,
-              "namespace": null,
-              "services": [],
-              "strategy": null
-            }
-          },
-          "type": "deployManifest"
-        },
+        {{ 
+          module "deploy.stage.away.v1" 
+          "account" "dev-us-west-2"
+          "name" "Deploy LB Dev"
+          "namespace" "dev"
+        }},
         {{
           module "deploy.stage.away.v1" 
           "account" "dev-us-west-2"
@@ -347,6 +307,478 @@
         }
       ],
       "updateTs": "1585936845000"
+    },
+    {
+      "application": "website-gitops",
+      "name": "Deploy and Check (Basic) (GitOps)"
+      "keepWaitingPipelines": false,
+      "lastModifiedBy": "anonymous",
+      "limitConcurrent": true,
+      "parallel": false,
+      "parameterConfig": [
+        {
+          "default": "1",
+          "description": "How many dev instances would you like?",
+          "label": "Number of Dev pods",
+          "name": "devcount",
+          "required": false
+        },
+        {
+          "default": "10",
+          "description": "How many prod instances would you like?",
+          "label": "Number of Prod pods",
+          "name": "prodcount"
+        }
+      ],
+      "stages": [
+        {
+          "account": "dev-us-west-2",
+          "cloudProvider": "kubernetes",
+          "isNew": true,
+          "manifests": [
+            {
+              "apiVersion": "v1",
+              "kind": "Service",
+              "metadata": {
+                "name": "website-service",
+                "namespace": "dev"
+              },
+              "spec": {
+                "ports": [
+                  {
+                    "port": 80,
+                    "protocol": "TCP",
+                    "targetPort": 80
+                  }
+                ],
+                "selector": {
+                  "app": "website"
+                },
+                "type": "LoadBalancer"
+              }
+            }
+          ],
+          "moniker": {
+            "app": "website-gitops"
+          },
+          "name": "Deploy LB",
+          "refId": "Deploy LB Dev",
+          "requisiteStageRefIds": [],
+          "skipExpressionEvaluation": false,
+          "source": "text",
+          "trafficManagement": {
+            "enabled": false,
+            "options": {
+              "enableTraffic": false,
+              "namespace": null,
+              "services": [],
+              "strategy": null
+            }
+          },
+          "type": "deployManifest"
+        },
+        {
+          "account": "dev-us-west-2",
+          "cloudProvider": "kubernetes",
+          "comments": "This tag: ${trigger.tag} is being deployed.",
+          "manifestArtifactAccount": "away168-github-artifact-account",
+          "manifests": [
+            {
+              "apiVersion": "apps/v1",
+              "kind": "Deployment",
+              "metadata": {
+                "labels": {
+                  "app": "website"
+                },
+                "name": "website-dev",
+                "namespace": "dev"
+              },
+              "spec": {
+                "replicas": "${ #toInt( parameters.devcount ) }",
+                "selector": {
+                  "matchLabels": {
+                    "app": "website"
+                  }
+                },
+                "template": {
+                  "metadata": {
+                    "labels": {
+                      "app": "website"
+                    }
+                  },
+                  "spec": {
+                    "containers": [
+                      {
+                        "image": "away168/mysite:${trigger.tag}",
+                        "name": "mysite",
+                        "ports": [
+                          {
+                            "containerPort": 80
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "moniker": {
+            "app": "website-gitops"
+          },
+          "name": "Deploy to Dev",
+          "notifications": [
+            {
+              "address": "se-notifications",
+              "level": "stage",
+              "message": {
+                "stage.complete": {
+                  "text": "Hi ${trigger.user}, the pipeline completed!"
+                },
+                "stage.failed": {
+                  "text": ""
+                },
+                "stage.starting": {
+                  "text": "${trigger.user} started deployment"
+                }
+              },
+              "type": "slack",
+              "when": [
+                "stage.starting",
+                "stage.complete",
+                "stage.failed"
+              ]
+            }
+          ],
+          "refId": "deployDev",
+          "relationships": {
+            "loadBalancers": [],
+            "securityGroups": []
+          },
+          "requiredArtifactIds": [],
+          "requisiteStageRefIds": [],
+          "sendNotifications": true,
+          "skipExpressionEvaluation": false,
+          "source": "text",
+          "stageEnabled": {
+            "expression": "true",
+            "type": "expression"
+          },
+          "trafficManagement": {
+            "enabled": false,
+            "options": {
+              "enableTraffic": false,
+              "services": []
+            }
+          },
+          "type": "deployManifest"
+        },
+        {
+          "continuePipeline": false,
+          "failPipeline": true,
+          "job": "do-nothing",
+          "master": "jenkins-sales",
+          "name": "Automated Test (via Jenkins)",
+          "parameters": {
+            "customconfig": "run test",
+            "special": false
+          },
+          "propertyFile": "build.properties",
+          "refId": "IntegrationTest",
+          "requisiteStageRefIds": [
+            "deployDev"
+          ],
+          "type": "jenkins"
+        },
+        {
+          "continuePipeline": false,
+          "failPipeline": true,
+          "job": "do-nothing",
+          "master": "jenkins-sales",
+          "name": "Security Scan",
+          "parameters": {
+            "customconfig": "perform a scan",
+            "special": true
+          },
+          "propertyFile": "build.properties",
+          "refId": "SecurityScan",
+          "requisiteStageRefIds": [
+            "deployDev"
+          ],
+          "type": "jenkins"
+        },
+        {
+          "failPipeline": true,
+          "instructions": "Check the website. Did it deploy properly?",
+          "judgmentInputs": [
+            {
+              "value": "But of course"
+            },
+            {
+              "value": "No"
+            }
+          ],
+          "name": "Manual Judgment",
+          "notifications": [],
+          "refId": "Manual Judgment",
+          "requisiteStageRefIds": [
+            "SecurityScan",
+            "IntegrationTest"
+          ],
+          "type": "manualJudgment"
+        },
+        {
+          "account": "prod-us-west-2",
+          "cloudProvider": "kubernetes",
+          "location": "prod",
+          "manifestName": "deployment website-dev",
+          "mode": "static",
+          "name": "Undo Stage Rollout (Manifest)",
+          "numRevisionsBack": 1,
+          "refId": "3",
+          "requisiteStageRefIds": [
+            "Manual Judgment"
+          ],
+          "stageEnabled": {
+            "expression": "${#judgment(\"Manual Judgment\") == \"No\"}",
+            "type": "expression"
+          },
+          "type": "undoRolloutManifest"
+        },
+        {
+          "account": "prod-us-west-2",
+          "cloudProvider": "kubernetes",
+          "isNew": true,
+          "manifests": [
+            {
+              "apiVersion": "v1",
+              "kind": "Service",
+              "metadata": {
+                "name": "website-service",
+                "namespace": "prod"
+              },
+              "spec": {
+                "ports": [
+                  {
+                    "port": 80,
+                    "protocol": "TCP",
+                    "targetPort": 80
+                  }
+                ],
+                "selector": {
+                  "app": "website"
+                },
+                "type": "LoadBalancer"
+              }
+            }
+          ],
+          "moniker": {
+            "app": "website-gitops"
+          },
+          "name": "Deploy LB Prod",
+          "refId": "Deploy LB Prod",
+          "requisiteStageRefIds": [
+            "Manual Judgment"
+          ],
+          "skipExpressionEvaluation": false,
+          "source": "text",
+          "trafficManagement": {
+            "enabled": false,
+            "options": {
+              "enableTraffic": false,
+              "namespace": null,
+              "services": [],
+              "strategy": null
+            }
+          },
+          "type": "deployManifest"
+        },
+        {
+          "account": "prod-us-west-2",
+          "cloudProvider": "kubernetes",
+          "comments": "This tag: ${trigger.tag} is being deployed.",
+          "manifestArtifactAccount": "away168-github-artifact-account",
+          "manifests": [
+            {
+              "apiVersion": "apps/v1",
+              "kind": "Deployment",
+              "metadata": {
+                "labels": {
+                  "app": "website"
+                },
+                "name": "website-dev",
+                "namespace": "prod"
+              },
+              "spec": {
+                "replicas": "${ #toInt( parameters.devcount ) }",
+                "selector": {
+                  "matchLabels": {
+                    "app": "website"
+                  }
+                },
+                "template": {
+                  "metadata": {
+                    "labels": {
+                      "app": "website"
+                    }
+                  },
+                  "spec": {
+                    "containers": [
+                      {
+                        "image": "away168/mysite:${trigger.tag}",
+                        "name": "mysite",
+                        "ports": [
+                          {
+                            "containerPort": 80
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          "moniker": {
+            "app": "website-gitops"
+          },
+          "name": "Deploy to Prod",
+          "notifications": [
+            {
+              "address": "se-notifications",
+              "level": "stage",
+              "message": {
+                "stage.complete": {
+                  "text": "Hi ${trigger.user}, the pipeline completed!"
+                },
+                "stage.failed": {
+                  "text": ""
+                },
+                "stage.starting": {
+                  "text": "${trigger.user} started deployment"
+                }
+              },
+              "type": "slack",
+              "when": [
+                "stage.starting",
+                "stage.complete",
+                "stage.failed"
+              ]
+            }
+          ],
+          "refId": "deployProd",
+          "relationships": {
+            "loadBalancers": [],
+            "securityGroups": []
+          },
+          "requiredArtifactIds": [],
+          "requisiteStageRefIds": [
+            "Manual Judgment",
+            "Deploy LB Prod"
+          ],
+          "sendNotifications": true,
+          "skipExpressionEvaluation": false,
+          "source": "text",
+          "stageEnabled": {
+            "expression": "${#judgment('Manual Judgment') != 'No'}",
+            "type": "expression"
+          },
+          "trafficManagement": {
+            "enabled": false,
+            "options": {
+              "enableTraffic": false,
+              "services": []
+            }
+          },
+          "type": "deployManifest"
+        },
+        {
+          "name": "Deploy to Private K8s",
+          "refId": "Deploy to Private K8s",
+          "requisiteStageRefIds": [
+            "Manual Judgment"
+          ],
+          "type": "wait",
+          "waitTime": 15
+        },
+        {
+          "name": "Deploy to AKS Prod",
+          "refId": "Deploy to AKS Prod",
+          "requisiteStageRefIds": [
+            "Manual Judgment"
+          ],
+          "type": "wait",
+          "waitTime": 17
+        },
+        {
+          "name": "Deploy to EKS Prod",
+          "refId": "Deploy to EKS Prod",
+          "requisiteStageRefIds": [
+            "Manual Judgment"
+          ],
+          "type": "wait",
+          "waitTime": 17
+        },
+        {
+          "name": "Deploy to PKS K8s",
+          "refId": "Deploy to PKS K8s",
+          "requisiteStageRefIds": [
+            "Manual Judgment"
+          ],
+          "type": "wait",
+          "waitTime": 17
+        },
+        {
+          "name": "Deploy to OpenShift K8s",
+          "refId": "Deploy to OpenShift K8s",
+          "requisiteStageRefIds": [
+            "Manual Judgment"
+          ],
+          "type": "wait",
+          "waitTime": 17
+        },
+        {
+          "customHeaders": {
+            "Authorization": "Basic YW5kcmV3LndheUBhcm1vcnkuaW86RWlKaFdRbmhWUWVrczlQZGI1aHlDQkNG",
+            "Content-Type": "application/json"
+          },
+          "failFastStatusCodes": [
+            400,
+            500
+          ],
+          "method": "POST",
+          "name": "Update Ticket",
+          "payload": {
+            "requestFieldValues": {
+              "customfield_10536": {
+                "id": "10264"
+              },
+              "summary": "Smoke Test Passed or Failed on ${trigger.buildNumber}"
+            },
+            "requestTypeId": "45",
+            "serviceDeskId": "6"
+          },
+          "refId": "4",
+          "requisiteStageRefIds": [
+            "deployDev"
+          ],
+          "statusUrlResolution": "getMethod",
+          "type": "webhook",
+          "url": "https://armory.atlassian.net/rest/servicedeskapi/request"
+        }
+      ],
+      "triggers": [
+        {
+          "account": "docker-registry-away168",
+          "enabled": false,
+          "organization": "away168",
+          "registry": "index.docker.io",
+          "repository": "away168/mysite",
+          "tag": "",
+          "type": "docker"
+        }
+      ],
+      "updateTs": "1587506333000"
     }
   ]
 }
