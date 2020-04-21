@@ -1,12 +1,14 @@
 {
+  "globals": {
+    "waitTime": "10",
+    "application": "website-gitops"
+  },
   "application": "website-gitops",
   "spec": 
   {
     "email": "andrew.way@armory.io"
   },
-  "globals": {
-    "waitTime": "10"
-  },
+
   "deleteStalePipelines": true,
   "pipelines": [
     {
