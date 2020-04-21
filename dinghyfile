@@ -186,35 +186,9 @@
           "name" "Deploy to OpenShift K8s"
           "requisiteStageRefIds" ["Manual Judgment"]
         }},
-        {
-          "customHeaders": {
-            "Authorization": "Basic xxx",
-            "Content-Type": "application/json"
-          },
-          "failFastStatusCodes": [
-            400,
-            500
-          ],
-          "method": "POST",
-          "name": "Update Ticket",
-          "payload": {
-            "requestFieldValues": {
-              "customfield_10536": {
-                "id": "10264"
-              },
-              "summary": "Smoke Test Passed or Failed on ${trigger.buildNumber}"
-            },
-            "requestTypeId": "45",
-            "serviceDeskId": "6"
-          },
-          "refId": "4",
-          "requisiteStageRefIds": [
-            "deployDev"
-          ],
-          "statusUrlResolution": "getMethod",
-          "type": "webhook",
-          "url": "https://armory.atlassian.net/rest/servicedeskapi/request"
-        }
+        {{ 
+          module "webhook.jira.away.v1"
+        }}
       ],
       "triggers": [
         {
@@ -739,7 +713,7 @@
         },
         {
           "customHeaders": {
-            "Authorization": "Basic YW5kcmV3LndheUBhcm1vcnkuaW86RWlKaFdRbmhWUWVrczlQZGI1aHlDQkNG",
+            "Authorization": "Basic xxx",
             "Content-Type": "application/json"
           },
           "failFastStatusCodes": [
