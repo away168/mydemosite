@@ -8,11 +8,10 @@
   {
     "email": "andrew.way@armory.io"
   },
-
   "deleteStalePipelines": true,
   "pipelines": [
     {
-      "application": "{{@application}}",
+      "application": "website-gitops",
       "name": "Deploy and Check [GitOps]",
       "expectedArtifacts": [],
       "keepWaitingPipelines": false,
