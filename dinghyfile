@@ -43,7 +43,7 @@
         {{
           module "deploy.stage.away.v1" 
           "account" "dev-us-west-2"
-          "name" "Deploy to Dev Apr-03-2020"
+          "name" "Deploy to Dev"
           "namespace" "dev"
           "refId" "deployDev"
           "appName" "website-gitops"
@@ -196,7 +196,7 @@
       "triggers": [
         {
           "account": "docker-registry-away168",
-          "enabled": false,
+          "enabled": true,
           "organization": "away168",
           "registry": "index.docker.io",
           "repository": "away168/mysite",
