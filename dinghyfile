@@ -43,7 +43,7 @@
         {{
           module "deploy.stage.away.v1" 
           "account" "dev-us-west-2"
-          "name" "Deploy to Dev Update Mar 2020"
+          "name" "Deploy to Dev Update April 21, 2020"
           "namespace" "dev"
           "refId" "deployDev"
           "appName" "website-gitops"
